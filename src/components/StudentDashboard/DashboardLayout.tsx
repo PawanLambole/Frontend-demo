@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface DashboardLayoutProps {
   children: React.ReactNode;
   currentPage: 'dashboard' | 'lessons' | 'roadmap' | 'profile';
-  onPageChange: (page: 'dashboard' | 'lessons' | 'roadmap' | 'profile') => void;
+  onNavigate: (page: 'dashboard' | 'lessons' | 'roadmap' | 'profile') => void;
   onLogout: () => void;
   userName: string;
+  userEmail: string;
+  profilePicture: string;
 }
 
-export default function DashboardLayout({ children, currentPage, onPageChange, onLogout, userName }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, currentPage, onNavigate, onLogout, userName, userEmail, profilePicture }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const menuItems = [
@@ -19,6 +21,11 @@ export default function DashboardLayout({ children, currentPage, onPageChange, o
     { id: 'roadmap', label: 'Roadmap', icon: Map },
     { id: 'profile', label: 'Profile', icon: User },
   ];
+
+  const handleNavigate = (page: 'dashboard' | 'lessons' | 'roadmap' | 'profile') => {
+    onNavigate(page);
+    setIsSidebarOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-dark-primary">
@@ -83,7 +90,7 @@ export default function DashboardLayout({ children, currentPage, onPageChange, o
             return (
               <motion.button
                 key={item.id}
-                onClick={() => onPageChange(item.id as any)}
+                onClick={() => handleNavigate(item.id as any)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-accent/20 to-accent-light/20 text-accent border border-accent/30'
@@ -128,10 +135,7 @@ export default function DashboardLayout({ children, currentPage, onPageChange, o
                   return (
                     <motion.button
                       key={item.id}
-                      onClick={() => {
-                        onPageChange(item.id as any);
-                        setIsSidebarOpen(false);
-                      }}
+                      onClick={() => handleNavigate(item.id as any)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                         isActive
                           ? 'bg-gradient-to-r from-accent/20 to-accent-light/20 text-accent border border-accent/30'

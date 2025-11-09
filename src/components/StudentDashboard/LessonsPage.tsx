@@ -1,4 +1,4 @@
-import { Clock, CheckCircle2, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, CheckCircle2, Play, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,9 +21,11 @@ interface Week {
 interface LessonsPageProps {
   weeks: Week[];
   onStartLesson: (lessonId: string) => void;
+  hasRoadmap: boolean;
+  onCreateRoadmap: () => void;
 }
 
-export default function LessonsPage({ weeks, onStartLesson }: LessonsPageProps) {
+export default function LessonsPage({ weeks, onStartLesson, hasRoadmap, onCreateRoadmap }: LessonsPageProps) {
   const [expandedWeeks, setExpandedWeeks] = useState<number[]>([1]); // Week 1 expanded by default
 
   const toggleWeek = (weekNumber: number) => {
@@ -36,6 +38,48 @@ export default function LessonsPage({ weeks, onStartLesson }: LessonsPageProps) 
 
   const completedLessons = weeks.reduce((total, week) => total + week.lessonsCompleted, 0);
   const totalLessons = weeks.reduce((total, week) => total + week.totalLessons, 0);
+
+  // Show empty state if no roadmap
+  if (!hasRoadmap) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <motion.div
+          className="bg-gradient-to-r from-accent/20 via-accent-light/20 to-accent/10 rounded-2xl p-6 sm:p-8 border border-accent/30"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-3xl font-bold mb-2">My Lessons</h1>
+          <p className="text-gray-300">Create a roadmap to access your personalized lessons</p>
+        </motion.div>
+
+        {/* Empty State */}
+        <motion.div
+          className="bg-dark-secondary rounded-2xl p-12 border border-gray-800 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="flex justify-center mb-6">
+            <div className="p-6 bg-accent/20 rounded-full">
+              <BookOpen className="w-16 h-16 text-accent" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-3">No Lessons Available</h2>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            You need to create a roadmap first to get access to personalized lessons tailored to your learning goals.
+          </p>
+          <button
+            onClick={onCreateRoadmap}
+            className="px-8 py-3 bg-gradient-to-r from-accent to-accent-light text-dark-primary rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 transition-all"
+          >
+            Create Your Roadmap
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

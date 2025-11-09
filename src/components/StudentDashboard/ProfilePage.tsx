@@ -7,6 +7,10 @@ interface ProfilePageProps {
   userEmail: string;
   learningGoal: string;
   profilePicture?: string;
+  totalWeeks: number;
+  totalLessons: number;
+  lessonsCompleted: number;
+  studyTimeHours: number;
   onSaveProfile: (data: { userName: string; userEmail: string; learningGoal: string; profilePicture?: string }) => void;
 }
 
@@ -21,7 +25,17 @@ const avatars = [
   'https://api.dicebear.com/7.x/avataaars/svg?seed=8',
 ];
 
-export default function ProfilePage({ userName, userEmail, learningGoal, profilePicture, onSaveProfile }: ProfilePageProps) {
+export default function ProfilePage({ 
+  userName, 
+  userEmail, 
+  learningGoal, 
+  profilePicture, 
+  totalWeeks,
+  totalLessons,
+  lessonsCompleted,
+  studyTimeHours,
+  onSaveProfile 
+}: ProfilePageProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [formData, setFormData] = useState({

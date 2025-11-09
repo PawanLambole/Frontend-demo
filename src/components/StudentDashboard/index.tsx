@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 import DashboardHome from './DashboardHome';
 import LessonsPage from './LessonsPage';
 import RoadmapPage from './RoadmapPage';
 import ProfilePage from './ProfilePage';
+import OnboardingFlow from './OnboardingFlow';
 
 interface Lesson {
   id: string;
@@ -26,137 +27,138 @@ interface StudentDashboardProps {
   onLogout: () => void;
 }
 
-export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'lessons' | 'roadmap' | 'profile'>('dashboard');
-  const [userData, setUserData] = useState({
-    userName: 'hello1',
-    userEmail: 'hello1@gmail.com',
-    learningGoal: 'I want to become a Software Developer',
-    profilePicture: '',
-  });
-
-  // Mock data - Replace with actual data from your backend
-  const weeksData: Week[] = [
+// Helper function to generate roadmap based on onboarding data
+const generateRoadmap = (learningGoal: string, experience: string[], timeCommitment: string): Week[] => {
+  // Base roadmap structure - can be customized based on inputs
+  const hasNoExperience = experience.includes('None');
+  const weeksCount = timeCommitment === '20+' ? 8 : timeCommitment === '10-20' ? 12 : 16;
+  
+  // Sample roadmap generation (you can expand this based on learningGoal and experience)
+  const roadmap: Week[] = [
     {
       weekNumber: 1,
-      title: 'Week 1: Java Fundamentals and Web Development Introduction',
-      lessonsCompleted: 1,
+      title: hasNoExperience ? 'Week 1: Programming Fundamentals' : 'Week 1: Advanced Concepts',
+      lessonsCompleted: 0,
       totalLessons: 5,
-      progress: 20,
+      progress: 0,
       lessons: [
         {
           id: 'w1l1',
-          title: 'Java Refresher',
-          description: 'Review Java syntax, data types, operators, control flow, and object-oriented programming principles (classes, objects, inheritance, polymorphism, encapsulation).',
-          duration: '5 hours',
-          completed: true,
+          title: hasNoExperience ? 'Introduction to Programming' : 'Advanced Data Structures',
+          description: hasNoExperience 
+            ? 'Learn the basics of programming, variables, and data types'
+            : 'Deep dive into trees, graphs, and advanced algorithms',
+          duration: '4 hours',
+          completed: false,
         },
         {
           id: 'w1l2',
-          title: 'Introduction to Web Development',
-          description: 'Understand the client-server architecture, HTTP protocol, and the role of HTML, CSS, and JavaScript in web development.',
+          title: hasNoExperience ? 'Variables and Data Types' : 'Design Patterns',
+          description: hasNoExperience 
+            ? 'Understanding how to store and manipulate data'
+            : 'Learn common software design patterns',
           duration: '3 hours',
           completed: false,
         },
         {
           id: 'w1l3',
-          title: 'HTML Fundamentals',
-          description: 'Learn HTML tags, attributes, structure, and semantic HTML. Build simple static web pages.',
-          duration: '4 hours',
+          title: 'Control Flow',
+          description: 'Master if statements, loops, and conditional logic',
+          duration: '3 hours',
           completed: false,
         },
         {
           id: 'w1l4',
-          title: 'CSS Fundamentals',
-          description: 'Learn CSS selectors, properties, and values. Style HTML elements and create basic layouts.',
+          title: 'Functions and Methods',
+          description: 'Learn to write reusable code with functions',
           duration: '4 hours',
           completed: false,
         },
         {
           id: 'w1l5',
-          title: 'Collections and Data Structures',
-          description: 'Understand and implement various Java collections like ArrayList, LinkedList, HashMap, HashSet. Learn about data structure concepts like stacks, queues, and trees.',
-          duration: '4 hours',
+          title: 'Practice Project',
+          description: 'Build your first small project',
+          duration: '6 hours',
           completed: false,
         },
       ],
     },
     {
       weekNumber: 2,
-      title: 'Week 2: Building Interactive Web Pages with JavaScript',
+      title: 'Week 2: Object-Oriented Programming',
       lessonsCompleted: 0,
-      totalLessons: 4,
+      totalLessons: 5,
       progress: 0,
       lessons: [
         {
           id: 'w2l1',
-          title: 'JavaScript Fundamentals',
-          description: 'Learn JavaScript syntax, variables, data types, operators, control flow, and functions.',
-          duration: '5 hours',
+          title: 'Classes and Objects',
+          description: 'Introduction to object-oriented programming concepts',
+          duration: '4 hours',
           completed: false,
         },
         {
           id: 'w2l2',
-          title: 'DOM Manipulation',
-          description: 'Understand the Document Object Model (DOM) and learn how to manipulate HTML elements using JavaScript.',
-          duration: '5 hours',
+          title: 'Inheritance and Polymorphism',
+          description: 'Learn about code reusability and flexibility',
+          duration: '4 hours',
           completed: false,
         },
         {
           id: 'w2l3',
-          title: 'Event Handling',
-          description: 'Learn how to handle user events (e.g., clicks, mouseovers, form submissions) using JavaScript.',
-          duration: '5 hours',
+          title: 'Encapsulation',
+          description: 'Understanding data hiding and access modifiers',
+          duration: '3 hours',
           completed: false,
         },
         {
           id: 'w2l4',
-          title: 'Asynchronous JavaScript and AJAX',
-          description: 'Understand asynchronous programming in JavaScript and learn how to make AJAX requests to fetch data from a server.',
-          duration: '5 hours',
+          title: 'Abstraction',
+          description: 'Learn to work with abstract classes and interfaces',
+          duration: '3 hours',
+          completed: false,
+        },
+        {
+          id: 'w2l5',
+          title: 'OOP Project',
+          description: 'Build a project using OOP principles',
+          duration: '6 hours',
           completed: false,
         },
       ],
     },
     {
       weekNumber: 3,
-      title: 'Week 3: Introduction to Java Servlets',
+      title: 'Week 3: Web Development Basics',
       lessonsCompleted: 0,
-      totalLessons: 5,
+      totalLessons: 4,
       progress: 0,
       lessons: [
         {
           id: 'w3l1',
-          title: 'Introduction to Java Servlets',
-          description: 'Understand the concept of Java Servlets, their role in handling HTTP requests, and the Servlet lifecycle.',
+          title: 'HTML Fundamentals',
+          description: 'Learn the structure of web pages',
           duration: '4 hours',
           completed: false,
         },
         {
           id: 'w3l2',
-          title: 'Servlet Request and Response',
-          description: 'Learn how to handle HTTP requests and generate HTTP responses using Java Servlets.',
+          title: 'CSS Styling',
+          description: 'Make your web pages beautiful',
           duration: '5 hours',
           completed: false,
         },
         {
           id: 'w3l3',
-          title: 'Session Management',
-          description: 'Understand session management techniques in web applications using cookies and sessions.',
-          duration: '4 hours',
+          title: 'JavaScript Basics',
+          description: 'Add interactivity to web pages',
+          duration: '5 hours',
           completed: false,
         },
         {
           id: 'w3l4',
-          title: 'Servlet Filters',
-          description: 'Learn about servlet filters and how to use them for tasks like authentication and logging.',
-          duration: '3 hours',
-          completed: false,
-        },
-        {
-          id: 'w3l5',
-          title: 'Building a Simple Web Application',
-          description: 'Build a simple web application using servlets to handle user requests and responses.',
+          title: 'Build Your First Website',
+          description: 'Create a complete responsive website',
           duration: '6 hours',
           completed: false,
         },
@@ -164,22 +166,127 @@ export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
     },
   ];
 
-  const totalLessons = weeksData.reduce((total, week) => total + week.totalLessons, 0);
-  const lessonsCompleted = weeksData.reduce((total, week) => total + week.lessonsCompleted, 0);
+  return roadmap.slice(0, Math.min(weeksCount, 12)); // Limit to reasonable number
+};
+
+export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'lessons' | 'roadmap' | 'profile'>('dashboard');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  const [userData, setUserData] = useState({
+    userName: 'Student',
+    userEmail: '',
+    learningGoal: '',
+    profilePicture: 'https://avatar.iran.liara.run/public/boy',
+  });
+
+  const [weeksData, setWeeksData] = useState<Week[]>([]);
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const savedRoadmap = localStorage.getItem('studentRoadmap');
+    const savedUser = localStorage.getItem('studentUser');
+    
+    if (savedRoadmap) {
+      setWeeksData(JSON.parse(savedRoadmap));
+    }
+    
+    if (savedUser) {
+      setUserData(JSON.parse(savedUser));
+    }
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (weeksData.length > 0) {
+      localStorage.setItem('studentRoadmap', JSON.stringify(weeksData));
+    }
+  }, [weeksData]);
+
+  useEffect(() => {
+    if (userData.learningGoal) {
+      localStorage.setItem('studentUser', JSON.stringify(userData));
+    }
+  }, [userData]);
+
+  const hasRoadmap = weeksData.length > 0;
+
+  const handleOnboardingComplete = (data: { learningGoal: string; experience: string[]; timeCommitment: string }) => {
+    // Generate roadmap based on onboarding data
+    const newRoadmap = generateRoadmap(data.learningGoal, data.experience, data.timeCommitment);
+    setWeeksData(newRoadmap);
+    
+    // Update user data
+    setUserData(prev => ({
+      ...prev,
+      learningGoal: data.learningGoal,
+    }));
+    
+    setShowOnboarding(false);
+  };
+
+  const handleCreateRoadmap = () => {
+    setShowOnboarding(true);
+  };
+
+  const handleDeleteRoadmap = () => {
+    if (window.confirm('Are you sure you want to delete your roadmap? This action cannot be undone.')) {
+      setWeeksData([]);
+      localStorage.removeItem('studentRoadmap');
+      setUserData(prev => ({ ...prev, learningGoal: '' }));
+    }
+  };
 
   const handleStartLesson = (lessonId: string) => {
-    console.log('Starting lesson:', lessonId);
-    // Implement lesson start logic
+    setWeeksData(prevWeeks =>
+      prevWeeks.map(week => ({
+        ...week,
+        lessons: week.lessons.map(lesson => {
+          if (lesson.id === lessonId) {
+            const newCompleted = !lesson.completed;
+            return { ...lesson, completed: newCompleted };
+          }
+          return lesson;
+        }),
+        lessonsCompleted: week.lessons.filter(l => 
+          l.id === lessonId ? !l.completed : l.completed
+        ).length,
+        progress: Math.round(
+          (week.lessons.filter(l => 
+            l.id === lessonId ? !l.completed : l.completed
+          ).length / week.totalLessons) * 100
+        ),
+      }))
+    );
   };
 
-  const handleSaveProfile = (data: { userName: string; userEmail: string; learningGoal: string; profilePicture?: string }) => {
+  const handleSaveProfile = (data: {
+    userName: string;
+    userEmail: string;
+    learningGoal: string;
+    profilePicture?: string;
+  }) => {
     setUserData({
       ...data,
-      profilePicture: data.profilePicture || '',
+      profilePicture: data.profilePicture || 'https://avatar.iran.liara.run/public/boy',
     });
-    console.log('Profile saved:', data);
-    // Implement save to backend
   };
+
+  // Calculate stats
+  const totalLessons = weeksData.reduce((sum, week) => sum + week.totalLessons, 0);
+  const lessonsCompleted = weeksData.reduce((sum, week) => sum + week.lessonsCompleted, 0);
+  const overallProgress = totalLessons > 0 ? Math.round((lessonsCompleted / totalLessons) * 100) : 0;
+  
+  // Calculate study time (estimate: completed lessons * average duration)
+  const studyTimeHours = lessonsCompleted * 4; // Assuming 4 hours average per lesson
+  
+  // Current week is the first week with incomplete lessons, or last week if all complete
+  const currentWeekNumber = weeksData.find(week => week.progress < 100)?.weekNumber || weeksData.length;
+
+  // Show onboarding if requested
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
 
   const renderPage = () => {
     switch (currentPage) {
@@ -188,23 +295,37 @@ export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
           <DashboardHome
             userName={userData.userName}
             learningGoal={userData.learningGoal}
+            totalWeeks={weeksData.length}
             totalLessons={totalLessons}
             lessonsCompleted={lessonsCompleted}
-            hoursStudied={11}
-            testAccuracy={70}
-            currentWeek={1}
-            weekData={weeksData[0]}
+            overallProgress={overallProgress}
+            studyTimeHours={studyTimeHours}
+            testAccuracy={85}
+            currentWeekNumber={currentWeekNumber}
+            weekData={weeksData.find(w => w.weekNumber === currentWeekNumber)}
             onStartLesson={handleStartLesson}
+            hasRoadmap={hasRoadmap}
+            onCreateRoadmap={handleCreateRoadmap}
           />
         );
       case 'lessons':
-        return <LessonsPage weeks={weeksData} onStartLesson={handleStartLesson} />;
+        return (
+          <LessonsPage
+            weeks={weeksData}
+            onStartLesson={handleStartLesson}
+            hasRoadmap={hasRoadmap}
+            onCreateRoadmap={handleCreateRoadmap}
+          />
+        );
       case 'roadmap':
         return (
           <RoadmapPage
             learningGoal={userData.learningGoal}
             weeks={weeksData}
             onStartLesson={handleStartLesson}
+            onCreateRoadmap={handleCreateRoadmap}
+            onDeleteRoadmap={handleDeleteRoadmap}
+            hasRoadmap={hasRoadmap}
           />
         );
       case 'profile':
@@ -214,6 +335,10 @@ export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
             userEmail={userData.userEmail}
             learningGoal={userData.learningGoal}
             profilePicture={userData.profilePicture}
+            totalWeeks={weeksData.length}
+            totalLessons={totalLessons}
+            lessonsCompleted={lessonsCompleted}
+            studyTimeHours={studyTimeHours}
             onSaveProfile={handleSaveProfile}
           />
         );
@@ -225,9 +350,11 @@ export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
   return (
     <DashboardLayout
       currentPage={currentPage}
-      onPageChange={setCurrentPage}
-      onLogout={onLogout}
+      onNavigate={setCurrentPage}
       userName={userData.userName}
+      userEmail={userData.userEmail}
+      profilePicture={userData.profilePicture}
+      onLogout={onLogout}
     >
       {renderPage()}
     </DashboardLayout>

@@ -1,4 +1,4 @@
-import { Target, TrendingUp, CheckCircle2, Clock, Play } from 'lucide-react';
+import { Target, TrendingUp, CheckCircle2, Clock, Play, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Lesson {
@@ -21,14 +21,57 @@ interface RoadmapPageProps {
   learningGoal: string;
   weeks: Week[];
   onStartLesson: (lessonId: string) => void;
-  onCreateRoadmap?: () => void;
-  onDeleteRoadmap?: () => void;
+  onCreateRoadmap: () => void;
+  onDeleteRoadmap: () => void;
+  hasRoadmap: boolean;
 }
 
-export default function RoadmapPage({ learningGoal, weeks, onStartLesson }: RoadmapPageProps) {
+export default function RoadmapPage({ learningGoal, weeks, onStartLesson, onCreateRoadmap, onDeleteRoadmap, hasRoadmap }: RoadmapPageProps) {
   const totalLessons = weeks.reduce((total, week) => total + week.totalLessons, 0);
   const completedLessons = weeks.reduce((total, week) => total + week.lessonsCompleted, 0);
-  const overallProgress = Math.round((completedLessons / totalLessons) * 100);
+  const overallProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+  // Show empty state if no roadmap
+  if (!hasRoadmap) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <motion.div
+          className="bg-gradient-to-r from-accent/20 via-accent-light/20 to-accent/10 rounded-2xl p-6 sm:p-8 border border-accent/30"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-3xl font-bold mb-2">Learning Roadmap</h1>
+          <p className="text-gray-300">Plan your personalized learning journey</p>
+        </motion.div>
+
+        {/* Empty State */}
+        <motion.div
+          className="bg-dark-secondary rounded-2xl p-12 border border-gray-800 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="flex justify-center mb-6">
+            <div className="p-6 bg-accent/20 rounded-full">
+              <Map className="w-16 h-16 text-accent" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-3">No Roadmap Found</h2>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            Create a personalized learning roadmap tailored to your goals and experience level. Our AI will guide you through a structured learning path.
+          </p>
+          <button
+            onClick={onCreateRoadmap}
+            className="px-8 py-3 bg-gradient-to-r from-accent to-accent-light text-dark-primary rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 transition-all"
+          >
+            Create Roadmap
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -88,6 +131,7 @@ export default function RoadmapPage({ learningGoal, weeks, onStartLesson }: Road
           className="px-6 py-3 bg-gradient-to-r from-accent to-accent-light text-dark-primary rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={onCreateRoadmap}
         >
           New Roadmap
         </motion.button>
@@ -95,6 +139,7 @@ export default function RoadmapPage({ learningGoal, weeks, onStartLesson }: Road
           className="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg font-medium hover:bg-red-500/30 transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={onDeleteRoadmap}
         >
           Delete Roadmap
         </motion.button>
