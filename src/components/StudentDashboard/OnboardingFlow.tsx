@@ -14,28 +14,91 @@ interface OnboardingFlowProps {
 }
 
 export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // Start at 0 for field selection
+  const [selectedField, setSelectedField] = useState('');
   const [learningGoal, setLearningGoal] = useState('');
   const [experience, setExperience] = useState<string[]>([]);
   const [timeCommitment, setTimeCommitment] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [preferredTopics, setPreferredTopics] = useState<string[]>([]);
 
+  // Field definitions with custom questions
+  const fields = {
+    'Software Development': {
+      icon: '💻',
+      languages: ['JavaScript', 'Python', 'Java', 'C++', 'C#', 'TypeScript', 'Ruby', 'Go', 'Swift', 'Kotlin', 'PHP', 'Rust', 'Dart', 'R', 'MATLAB', 'Scala', 'Perl'],
+      topics: ['Web Development', 'Mobile Development', 'Backend Development', 'Frontend Development', 'Full Stack', 'DevOps', 'Cloud Computing', 'API Development', 'Microservices']
+    },
+    'Data Science & AI': {
+      icon: '📊',
+      languages: ['Python', 'R', 'SQL', 'Julia', 'MATLAB', 'Scala', 'Java'],
+      topics: ['Machine Learning', 'Deep Learning', 'Data Analysis', 'Statistical Modeling', 'Data Visualization', 'Big Data', 'Natural Language Processing', 'Computer Vision', 'Data Engineering']
+    },
+    'Design': {
+      icon: '🎨',
+      languages: ['HTML/CSS', 'JavaScript', 'None'],
+      topics: ['UI Design', 'UX Design', 'Graphic Design', 'Motion Graphics', 'Product Design', 'Brand Design', 'Web Design', 'Mobile Design', 'Design Systems']
+    },
+    'Business & Marketing': {
+      icon: '📈',
+      languages: ['Excel/Spreadsheets', 'SQL', 'Python', 'None'],
+      topics: ['Digital Marketing', 'SEO/SEM', 'Social Media Marketing', 'Content Marketing', 'Business Analytics', 'Market Research', 'Product Management', 'Sales Strategy', 'Brand Management']
+    },
+    'Cybersecurity': {
+      icon: '🔒',
+      languages: ['Python', 'C', 'C++', 'Java', 'JavaScript', 'Bash/Shell', 'PowerShell'],
+      topics: ['Network Security', 'Ethical Hacking', 'Penetration Testing', 'Security Analysis', 'Cryptography', 'Cloud Security', 'Security Operations', 'Incident Response', 'Threat Intelligence']
+    },
+    'Game Development': {
+      icon: '🎮',
+      languages: ['C#', 'C++', 'JavaScript', 'Python', 'Lua', 'Java'],
+      topics: ['2D Game Development', '3D Game Development', 'Game Design', 'Game Physics', 'Game AI', 'Mobile Games', 'VR/AR Games', 'Multiplayer Games', 'Game Engines']
+    },
+    'Cloud & DevOps': {
+      icon: '☁️',
+      languages: ['Python', 'Bash/Shell', 'Go', 'JavaScript', 'YAML', 'PowerShell'],
+      topics: ['AWS', 'Azure', 'Google Cloud', 'Docker', 'Kubernetes', 'CI/CD', 'Infrastructure as Code', 'Monitoring & Logging', 'Serverless']
+    },
+    'Blockchain': {
+      icon: '⛓️',
+      languages: ['Solidity', 'JavaScript', 'Python', 'Go', 'Rust'],
+      topics: ['Smart Contracts', 'DeFi', 'NFTs', 'Blockchain Architecture', 'Cryptocurrency', 'Web3', 'dApps', 'Consensus Mechanisms', 'Blockchain Security']
+    },
+    'Creative Arts': {
+      icon: '🎬',
+      languages: ['None'],
+      topics: ['Video Editing', '3D Modeling', 'Animation', 'Photography', 'Audio Production', 'Content Creation', 'Digital Art', 'VFX', 'Motion Design']
+    },
+    'Health & Fitness': {
+      icon: '💪',
+      languages: ['None'],
+      topics: ['Personal Training', 'Nutrition', 'Yoga', 'Fitness Coaching', 'Sports Science', 'Mental Health', 'Wellness', 'Physical Therapy', 'Health Coaching']
+    }
+  };
+
   const handleNext = () => {
     if (step < 5) {
       setStep(step + 1);
     } else {
-      onComplete({ learningGoal, experience, timeCommitment, skillLevel, preferredTopics });
+      onComplete({ learningGoal: learningGoal || selectedField, experience, timeCommitment, skillLevel, preferredTopics });
     }
   };
 
   const handlePrevious = () => {
-    if (step > 1) {
+    if (step > 0) {
       setStep(step - 1);
     }
   };
 
+  const handleFieldSelect = (field: string) => {
+    setSelectedField(field);
+    setExperience([]);
+    setPreferredTopics([]);
+    setStep(1);
+  };
+
   const isStepValid = () => {
+    if (step === 0) return selectedField.length > 0;
     if (step === 1) return learningGoal.trim().length > 0;
     if (step === 2) return experience.length > 0;
     if (step === 3) return skillLevel.length > 0;
@@ -44,7 +107,10 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
     return false;
   };
 
-  const progress = (step / 5) * 100;
+  const totalSteps = 6; // Including field selection
+  const progress = (step / (totalSteps - 1)) * 100;
+  
+  const currentField = fields[selectedField as keyof typeof fields];
 
   return (
     <div className="min-h-screen bg-dark-primary flex items-center justify-center px-4 py-8">
@@ -76,19 +142,21 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="text-center text-sm text-gray-400 mb-4">
-            Question {step} of 5 <span className="text-accent">• {Math.round(progress)}% complete</span>
+        {step > 0 && (
+          <div className="mb-8">
+            <div className="text-center text-sm text-gray-400 mb-4">
+              Question {step} of 5 <span className="text-accent">• {Math.round(progress)}% complete</span>
+            </div>
+            <div className="h-2 bg-dark-tertiary rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-accent to-accent-light"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
           </div>
-          <div className="h-2 bg-dark-tertiary rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-accent to-accent-light"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-        </div>
+        )}
 
         {/* Content Card */}
         <motion.div
@@ -98,6 +166,40 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
+          {/* Step 0: Field Selection */}
+          {step === 0 && (
+            <div>
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-4 bg-accent/20 rounded-full">
+                  <Target className="w-8 h-8 text-accent" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-center mb-2">Choose Your Field</h2>
+              <p className="text-gray-400 text-center mb-8">Select the area you want to learn and grow in</p>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {Object.entries(fields).map(([field, data]) => (
+                    <button
+                      key={field}
+                      onClick={() => handleFieldSelect(field)}
+                      className={`p-4 rounded-lg border transition-all text-left ${
+                        selectedField === field
+                          ? 'bg-accent/20 border-accent text-accent'
+                          : 'bg-dark-tertiary border-gray-700 text-gray-300 hover:border-accent/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{data.icon}</span>
+                        <span className="font-medium">{field}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Step 1: Learning Goal */}
           {step === 1 && (
             <div>
@@ -107,17 +209,28 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-center mb-2">What's Your Goal?</h2>
-              <p className="text-gray-400 text-center mb-8">Tell us what you want to achieve</p>
+              <p className="text-gray-400 text-center mb-8">Tell us what you want to achieve in {selectedField}</p>
               
               <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-300">
-                  What is your learning goal?
+                  What is your specific learning goal?
                 </label>
                 <input
                   type="text"
                   value={learningGoal}
                   onChange={(e) => setLearningGoal(e.target.value)}
-                  placeholder="e.g., I want to become a Full Stack Developer"
+                  placeholder={
+                    selectedField === 'Software Development' ? 'e.g., I want to become a Full Stack Developer' :
+                    selectedField === 'Data Science & AI' ? 'e.g., I want to become a Machine Learning Engineer' :
+                    selectedField === 'Design' ? 'e.g., I want to become a UI/UX Designer' :
+                    selectedField === 'Business & Marketing' ? 'e.g., I want to become a Digital Marketing Expert' :
+                    selectedField === 'Cybersecurity' ? 'e.g., I want to become an Ethical Hacker' :
+                    selectedField === 'Game Development' ? 'e.g., I want to create my own indie game' :
+                    selectedField === 'Cloud & DevOps' ? 'e.g., I want to become a Cloud Architect' :
+                    selectedField === 'Blockchain' ? 'e.g., I want to develop smart contracts' :
+                    selectedField === 'Creative Arts' ? 'e.g., I want to become a professional video editor' :
+                    'e.g., I want to become a certified fitness trainer'
+                  }
                   className="w-full px-4 py-3 bg-dark-tertiary border border-gray-700 rounded-lg focus:outline-none focus:border-accent transition-colors text-white"
                   autoFocus
                 />
@@ -125,8 +238,8 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
             </div>
           )}
 
-          {/* Step 2: Programming Languages */}
-          {step === 2 && (
+          {/* Step 2: Experience/Tools */}
+          {step === 2 && currentField && (
             <div>
               <div className="flex items-center justify-center mb-6">
                 <div className="p-4 bg-accent/20 rounded-full">
@@ -134,18 +247,22 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-center mb-2">Your Experience</h2>
-              <p className="text-gray-400 text-center mb-8">Which programming languages are you already familiar with?</p>
+              <p className="text-gray-400 text-center mb-8">
+                {selectedField.includes('Development') || selectedField.includes('Data Science') || selectedField.includes('Cybersecurity') || selectedField.includes('Blockchain')
+                  ? 'Which languages/tools are you already familiar with?'
+                  : selectedField === 'Design'
+                  ? 'Which design tools have you used?'
+                  : selectedField === 'Business & Marketing'
+                  ? 'Which tools/platforms have you used?'
+                  : 'What experience do you already have?'}
+              </p>
               
               <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-300">
                   Select all that apply
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {[
-                    'JavaScript', 'Python', 'Java', 'C++', 'C#', 'TypeScript', 
-                    'Ruby', 'Go', 'Swift', 'Kotlin', 'PHP', 'Rust', 
-                    'Dart', 'R', 'MATLAB', 'Scala', 'Perl', 'None'
-                  ].map((lang) => (
+                  {currentField.languages.concat(['None']).map((lang) => (
                     <button
                       key={lang}
                       onClick={() => {
@@ -214,7 +331,7 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
           )}
 
           {/* Step 4: Preferred Topics */}
-          {step === 4 && (
+          {step === 4 && currentField && (
             <div>
               <div className="flex items-center justify-center mb-6">
                 <div className="p-4 bg-accent/20 rounded-full">
@@ -222,24 +339,14 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-center mb-2">Areas of Interest</h2>
-              <p className="text-gray-400 text-center mb-8">Which topics would you like to focus on?</p>
+              <p className="text-gray-400 text-center mb-8">Which topics in {selectedField} would you like to focus on?</p>
               
               <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-300">
                   Select all that interest you
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {[
-                    'Web Development',
-                    'Mobile Development',
-                    'Data Science',
-                    'Machine Learning',
-                    'DevOps',
-                    'Cloud Computing',
-                    'Cybersecurity',
-                    'Game Development',
-                    'UI/UX Design',
-                  ].map((topic) => (
+                  {currentField.topics.map((topic) => (
                     <button
                       key={topic}
                       onClick={() => {
@@ -305,7 +412,7 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
 
           {/* Navigation Buttons */}
           <div className="flex gap-3 mt-8">
-            {step > 1 && (
+            {step > 0 && (
               <button
                 onClick={handlePrevious}
                 className="flex-1 px-6 py-3 bg-dark-tertiary text-gray-300 border border-gray-700 rounded-lg font-medium hover:bg-dark-primary transition-all"
@@ -313,17 +420,31 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
                 Previous
               </button>
             )}
-            <button
-              onClick={handleNext}
-              disabled={!isStepValid()}
-              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${
-                isStepValid()
-                  ? 'bg-gradient-to-r from-accent to-accent-light text-dark-primary hover:shadow-lg hover:shadow-accent/30'
-                  : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {step === 5 ? 'Create Roadmap' : 'Next'}
-            </button>
+            {step === 0 ? (
+              <button
+                onClick={handleNext}
+                disabled={!isStepValid()}
+                className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${
+                  isStepValid()
+                    ? 'bg-gradient-to-r from-accent to-accent-light text-dark-primary hover:shadow-lg hover:shadow-accent/30'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Continue
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                disabled={!isStepValid()}
+                className={`flex-1 px-6 py-3 rounded-lg font-medium transition-all ${
+                  isStepValid()
+                    ? 'bg-gradient-to-r from-accent to-accent-light text-dark-primary hover:shadow-lg hover:shadow-accent/30'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {step === 5 ? 'Create Roadmap' : 'Next'}
+              </button>
+            )}
           </div>
         </motion.div>
       </motion.div>
