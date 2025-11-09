@@ -268,18 +268,22 @@ export default function ProfilePage({
       {/* Account Statistics */}
       <div className="bg-dark-secondary rounded-xl p-6 border border-gray-800">
         <h2 className="text-xl font-bold mb-6">Account Statistics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-dark-tertiary rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-accent mb-1">-</div>
+            <div className="text-3xl font-bold text-accent mb-1">{totalWeeks}</div>
+            <div className="text-sm text-gray-400">Total Weeks</div>
+          </div>
+          <div className="bg-dark-tertiary rounded-lg p-4 text-center">
+            <div className="text-3xl font-bold text-blue-400 mb-1">{totalLessons}</div>
+            <div className="text-sm text-gray-400">Total Lessons</div>
+          </div>
+          <div className="bg-dark-tertiary rounded-lg p-4 text-center">
+            <div className="text-3xl font-bold text-green-400 mb-1">{lessonsCompleted}</div>
             <div className="text-sm text-gray-400">Lessons Completed</div>
           </div>
           <div className="bg-dark-tertiary rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-blue-400 mb-1">-</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">{studyTimeHours}h</div>
             <div className="text-sm text-gray-400">Hours Studied</div>
-          </div>
-          <div className="bg-dark-tertiary rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-purple-400 mb-1">-</div>
-            <div className="text-sm text-gray-400">Average Score</div>
           </div>
         </div>
       </div>

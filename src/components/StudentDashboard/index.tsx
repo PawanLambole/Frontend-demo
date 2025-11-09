@@ -33,11 +33,25 @@ const generateRoadmap = (learningGoal: string, experience: string[], timeCommitm
   const hasNoExperience = experience.includes('None');
   const weeksCount = timeCommitment === '20+' ? 8 : timeCommitment === '10-20' ? 12 : 16;
   
-  // Sample roadmap generation (you can expand this based on learningGoal and experience)
+  // Customize roadmap title based on learning goal
+  const goalKeywords = learningGoal.toLowerCase();
+  const isWebDev = goalKeywords.includes('web') || goalKeywords.includes('frontend') || goalKeywords.includes('full stack');
+  const isMobile = goalKeywords.includes('mobile') || goalKeywords.includes('android') || goalKeywords.includes('ios');
+  const isDataScience = goalKeywords.includes('data') || goalKeywords.includes('ml') || goalKeywords.includes('ai');
+  
+  // Sample roadmap generation (customized based on learningGoal and experience)
   const roadmap: Week[] = [
     {
       weekNumber: 1,
-      title: hasNoExperience ? 'Week 1: Programming Fundamentals' : 'Week 1: Advanced Concepts',
+      title: hasNoExperience 
+        ? 'Week 1: Programming Fundamentals' 
+        : isWebDev 
+          ? 'Week 1: Web Development Essentials'
+          : isMobile
+            ? 'Week 1: Mobile Development Basics'
+            : isDataScience
+              ? 'Week 1: Data Science Foundations'
+              : 'Week 1: Advanced Programming Concepts',
       lessonsCompleted: 0,
       totalLessons: 5,
       progress: 0,
