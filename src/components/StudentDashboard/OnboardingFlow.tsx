@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Target, MessageCircle, Map, BookOpen } from 'lucide-react';
+import { Target, MessageCircle, Map, BookOpen, ArrowLeft, Globe } from 'lucide-react';
 
 interface OnboardingFlowProps {
   onComplete: (data: { 
@@ -10,15 +10,18 @@ interface OnboardingFlowProps {
     skillLevel: string;
     preferredTopics: string[];
   }) => void;
+  onBack?: () => void;
 }
 
-export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
   const [step, setStep] = useState(1);
   const [learningGoal, setLearningGoal] = useState('');
   const [experience, setExperience] = useState<string[]>([]);
   const [timeCommitment, setTimeCommitment] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [preferredTopics, setPreferredTopics] = useState<string[]>([]);
+  const [language, setLanguage] = useState('English');
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   const handleNext = () => {
     if (step < 5) {
@@ -45,8 +48,64 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const progress = (step / 5) * 100;
 
+  const languages = ['English', 'हिंदी (Hindi)', 'मराठी (Marathi)', 'தமிழ் (Tamil)', 'తెలుగు (Telugu)', 'বাংলা (Bengali)', 'ગુજરાતી (Gujarati)', 'ಕನ್ನಡ (Kannada)'];
+
   return (
-    <div className="min-h-screen bg-dark-primary flex items-center justify-center px-4">
+    <div className="min-h-screen bg-dark-primary flex items-center justify-center px-4 py-8">
+      {/* Back Button - Top Left */}
+      {onBack && (
+        <motion.button
+          onClick={onBack}
+          className="fixed top-6 left-6 p-3 bg-dark-secondary border border-gray-800 rounded-lg hover:bg-dark-tertiary transition-all group z-50"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          title="Go Back"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-accent transition-colors" />
+        </motion.button>
+      )}
+
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-6 right-6 z-50">
+        <div className="relative">
+          <motion.button
+            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+            className="flex items-center gap-2 px-4 py-3 bg-dark-secondary border border-gray-800 rounded-lg hover:bg-dark-tertiary transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Globe className="w-5 h-5 text-accent" />
+            <span className="text-sm font-medium">{language}</span>
+          </motion.button>
+          
+          {showLanguageMenu && (
+            <motion.div
+              className="absolute right-0 mt-2 w-56 bg-dark-secondary border border-gray-800 rounded-lg shadow-xl overflow-hidden"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {languages.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => {
+                    setLanguage(lang);
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full px-4 py-3 text-left transition-all ${
+                    language === lang
+                      ? 'bg-accent/20 text-accent'
+                      : 'text-gray-300 hover:bg-dark-tertiary'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </div>
+
       <motion.div
         className="w-full max-w-2xl"
         initial={{ opacity: 0, y: 20 }}

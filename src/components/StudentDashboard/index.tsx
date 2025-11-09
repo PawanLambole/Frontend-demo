@@ -305,7 +305,10 @@ export default function StudentDashboard({ onLogout }: StudentDashboardProps) {
 
   // Show onboarding if requested
   if (showOnboarding) {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+    return <OnboardingFlow 
+      onComplete={handleOnboardingComplete} 
+      onBack={() => setShowOnboarding(false)}
+    />;
   }
 
   const renderPage = () => {

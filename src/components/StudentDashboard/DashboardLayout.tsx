@@ -40,17 +40,19 @@ export default function DashboardLayout({ children, currentPage, onNavigate, onL
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-4">
-              <motion.div
+              <motion.button
+                onClick={() => window.location.href = '/'}
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
+                title="Back to Home"
               >
                 <img
                   src="/Sahayak%20AI%20logo.png"
                   alt="Sahayak AI"
                   className="h-8 w-auto"
                 />
-              </motion.div>
+              </motion.button>
             </div>
 
             {/* Navigation Menu - Desktop */}
