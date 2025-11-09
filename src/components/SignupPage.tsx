@@ -30,70 +30,86 @@ export default function SignupPage({ onBack, onLogin }: SignupPageProps) {
       <button
         onClick={onBack}
         className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors z-50 hover:scale-110"
+        aria-label="Go back"
       >
         ← Back
       </button>
 
       <motion.div
-        className="max-w-2xl w-full"
+        className="max-w-6xl w-full"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 px-4">
           <div className="flex items-center gap-2 justify-center mb-4">
-            <img src="/Sahayak%20AI%20logo.png" alt="Sahayak AI" className="h-10 w-auto" />
+            <img src="/Sahayak%20AI%20logo.png" alt="Sahayak AI" className="h-12 w-auto" />
           </div>
-          <h1 className="text-4xl font-bold mb-3">How do you want to use Sahayak-AI?</h1>
-          <p className="text-gray-400">We'll personalize your setup experience accordingly.</p>
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-3">How do you want to use Sahayak-AI?</h1>
+          <p className="text-gray-400 max-w-2xl mx-auto">Choose the role that best fits you — we'll tailor the onboarding and feature set. You can always switch later.</p>
         </div>
 
-        <div className="space-y-4 mb-8">
-          <motion.div
-            onClick={() => {
-              setSelectedRole('teacher');
-              setView('teacher');
-            }}
-            className={`p-6 border-2 rounded-lg cursor-pointer flex items-start gap-4 ${
-              selectedRole === 'teacher'
-                ? 'border-accent bg-accent/10'
-                : 'border-gray-700 bg-dark-secondary'
-            }`}
-            whileHover={{ scale: 1.02, borderColor: selectedRole === 'teacher' ? '#00d4aa' : '#00d4aa80' }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300 }}
+        <div className="grid gap-6 md:grid-cols-2 items-stretch">
+          {/* Teacher Card */}
+          <motion.section
+            role="button"
+            tabIndex={0}
+            aria-pressed={selectedRole === 'teacher'}
+            onClick={() => { setSelectedRole('teacher'); setView('teacher'); }}
+            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { setSelectedRole('teacher'); setView('teacher'); } }}
+            className={`${selectedRole === 'teacher' ? 'ring-2 ring-accent/40' : ''} p-8 rounded-2xl bg-gradient-to-b from-dark-secondary/60 to-dark-secondary border border-gray-800 shadow-lg cursor-pointer`}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.995 }}
+            transition={{ type: "spring", stiffness: 240 }}
           >
-            <div className="text-3xl">🎓</div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1">I'm here to teach and guide</h3>
-              <p className="text-gray-400">Create courses and track student progress</p>
-            </div>
-            <span className="px-3 py-1 bg-gradient-to-r from-accent to-accent-light text-dark-primary text-xs font-bold rounded-full">Free trial</span>
-          </motion.div>
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">🎓</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold">I'm here to teach and guide</h3>
+                <p className="text-gray-400 mt-2">Create interactive courses, assign work, and track student progress with intelligent analytics.</p>
 
-          <motion.div
-            onClick={() => {
-              setSelectedRole('student');
-              setView('student');
-            }}
-            className={`p-6 border-2 rounded-lg cursor-pointer flex items-start gap-4 ${
-              selectedRole === 'student'
-                ? 'border-accent bg-accent/10'
-                : 'border-gray-700 bg-dark-secondary'
-            }`}
-            whileHover={{ scale: 1.02, borderColor: selectedRole === 'student' ? '#00d4aa' : '#00d4aa80' }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="text-3xl">📖</div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1">I'm here to learn and grow</h3>
-              <p className="text-gray-400">Access personalized learning and practice</p>
+                <ul className="mt-4 grid gap-2">
+                  <li className="text-sm text-gray-300">• Curriculum builder with AI suggestions</li>
+                  <li className="text-sm text-gray-300">• Class & student analytics dashboard</li>
+                  <li className="text-sm text-gray-300">• Integrations for gradebooks & LMS</li>
+                </ul>
+
+                {/* Card is clickable; primary CTA removed to make entire card the action target */}
+              </div>
             </div>
-          </motion.div>
+          </motion.section>
+
+          {/* Student Card */}
+          <motion.section
+            role="button"
+            tabIndex={0}
+            aria-pressed={selectedRole === 'student'}
+            onClick={() => { setSelectedRole('student'); setView('student'); }}
+            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { setSelectedRole('student'); setView('student'); } }}
+            className={`${selectedRole === 'student' ? 'ring-2 ring-accent/40' : ''} p-8 rounded-2xl bg-gradient-to-b from-dark-tertiary/60 to-dark-tertiary border border-gray-800 shadow-lg cursor-pointer`}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.995 }}
+            transition={{ type: "spring", stiffness: 240 }}
+          >
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">📖</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold">I'm here to learn and grow</h3>
+                <p className="text-gray-400 mt-2">Access personalized learning paths, practice exercises, and get feedback to accelerate your learning.</p>
+
+                <ul className="mt-4 grid gap-2">
+                  <li className="text-sm text-gray-300">• Personalized study plans</li>
+                  <li className="text-sm text-gray-300">• Hands-on practice and quizzes</li>
+                  <li className="text-sm text-gray-300">• Track progress and achievements</li>
+                </ul>
+
+                {/* Card is clickable; primary CTA removed to make entire card the action target */}
+              </div>
+            </div>
+          </motion.section>
         </div>
 
-        <div className="text-center">
+        <div className="text-center mt-8">
           <p className="text-gray-400">Already have an account? <button onClick={onLogin} className="text-accent hover:text-accent-light transition-colors font-semibold">Login here</button></p>
         </div>
       </motion.div>
